@@ -215,13 +215,13 @@ In this exercise, you will use the Node-RED development environment pre-installe
 
     ![Node-RED Environment](images/04020-NodeRedEnvironment.png)
 
-1. If you see other flows in addition to "**Flow 1**", such as "**Flow 2, 3 or 4**", you will need to delete them. To delete these flows, first select the flow tab that you want to delete **(make sure you that don't have the Flow 1 tab selected)**, then click the drop-down menu on the top right (next to the Deploy button), select Flows, and click Delete.
-
-![Node-RED Environment Layout](images/04031-NodeRedDeleteFlow.png)
-
 1. The Node-RED Environment can be used to create IoT workflows.
 
     ![Node-RED Environment Layout](images/04030-NodeRedEnvironmentLayout.png)
+
+1. If you see other flows in addition to "**Flow 1**", such as "**Flow 2, 3 or 4**", you will need to delete them. To delete these flows, first select the flow tab that you want to delete **(make sure you that don't have the Flow 1 tab selected)**, then click the drop-down menu on the top right (next to the Deploy button), select Flows, and click Delete.
+
+    ![Node-RED Environment Layout](images/04031-NodeRedDeleteFlow.png)
 
 1. To create a new flow, click the "**+**" button to the right of the "**Flow 1**" tab along the top of the Visual Editor.  A new flow, named "**Flow 2**" will open on a new tab.
 
@@ -435,21 +435,30 @@ That means that we need to select a region that supports all of the services we 
 - Azure Storage
 - Azure SQL Database
 - Azure Web Apps
-- Azure Function Apps
-- Azure PowerBI Embedded
+- Azure Functions
 
 <a name="locations"></a>
-At the time this is being written (October 2016), the following regions have all of the required services. **THIS LIST WILL GROW OVER TIME**. You are welcome to review the <a target="_blank" href="https://azure.microsoft.com/en-us/regions/services/">Products available by region</a> to see if any additional regions provide the resources needed.  Otherwise, simply pick the region from the list below that is closest to you, and ensure that you choose that region for each resource you deploy.
+At the time this is being written (August 2017), the following regions have all of the required services. **THIS LIST WILL GROW OVER TIME**. You are welcome to review the <a target="_blank" href="https://azure.microsoft.com/en-us/regions/services/">Products available by region</a> to see if any additional regions provide the resources needed.  Otherwise, simply pick the region from the list below that is closest to you, and ensure that you choose that region for each resource you deploy.
 
+- East US
+- East US 2
+- Central US
 - West US
+- West US 2
 - North Europe
 - West Europe
+- UK South
 - Southeast Asia
+- East Asia
+- Australia East
 - Australia Southeast
+- Central India
+- Japan East
+- Japan West
 
 ### Common Naming Convention ###
 
-We will be provisioning a number of resources in this lab.  Some of these resources require globally unique names.  In addition, we need to be able to refer to those resources in the lab documentation.  To facilitate that, it is ***strongly recommended*** that you juse the naming convention outlined here.  In the architecture diagram above, you will see that resources have been named with a ***`<name>`*** prefix, and then some resource specific name.
+We will be provisioning a number of resources in this lab.  Some of these resources require globally unique names.  In addition, we need to be able to refer to those resources in the lab documentation.  To facilitate that, it is ***strongly recommended*** that you use the naming convention outlined here.  In the architecture diagram above, you will see that resources have been named with a ***`<name>`*** prefix, and then some resource specific name.
 
 Choose a ***`<name>`*** prefix that is unique to you.  It is recommended that you use something like your initials.  For example if your name where "**Jane Q. Doe"** you might select "**jqd**" as your name prefix. To add a little more uniqueness you could add in your two digit birth month.  For example, if Jane was born in "**October**" she might use "**jqd10**".  **Some resource names must be at least six characters or longer.  Having a prefix that is 4-6 characters long will help ensure our names meet the minimum length.**
 
@@ -479,9 +488,7 @@ The following table is a summary of the Azure services you will create in the la
 | Web App |  ***&lt;name&gt;web*** | The Azure Web App is where we will deploy our Node.js application that provides the web site for our solution.  We can then go to this site to view temperatures from our devices queried from the SQL Database |
 | Function App |  ***&lt;name&gt;functions*** | The Azure Function App contains the ***TempAlert*** function.  A single Function App can contain many functions.  We'll just have one. |
 | Function |  ***TempAlert*** | The ***TempAlert*** function will be triggered automatically whenever a new message is sent to our ***&lt;name&gt;alerts*** event hub. It will then read those messages, retrieve the id of the device it was sent from, and then send a message through the IoT Hub back to that device to let it know that its temperature has exceeded acceptible levels.  The device can then sound an alarm by turning on its buzzer. |
-| Power BI Embedded Workspace Collection |  ***&lt;name&gt;collection*** | Power BI Embedded Collections are what you configure in Azure to host one or more Power BI Embedded Workspaces. |
-| Power BI Embedded Workspace |  ***system generated guid*** | The Power BI Embedded Workspace is where we can upload one or more reports. |
-| Power BI Embedded Report |  ***TemperatureChart*** | The ***TemperatureChart*** report is a pre-built report that displays device and temperature data from the ***&lt;name&gt;db*** Azure SQL Database.  It is provided as the ***TemperatureChart.pbix*** Power BI Desktop file in the lab files.  We'll upload this report into our Power BI Embedded Workspace and then embed it in the UI of our Web Application.  Users viewing the web application in their browser can then see that report. |
+| Power BI Report |  ***TemperatureChart*** | The ***TemperatureChart*** report is a pre-built report that displays device and temperature data from the ***&lt;name&gt;db*** Azure SQL Database.  It is provided as the ***TemperatureChart.pbix*** Power BI Desktop file in the lab files.  We'll upload this report into our Power BI Workspace and then embed it in the UI of our Web Application.  Users viewing the web application in their browser can then see that report. |
 
 ### Documenting Your Choices ###
 
