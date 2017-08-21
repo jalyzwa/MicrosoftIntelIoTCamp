@@ -215,6 +215,10 @@ In this exercise, you will use the Node-RED development environment pre-installe
 
     ![Node-RED Environment](images/04020-NodeRedEnvironment.png)
 
+1. If you see other flows in addition to "**Flow 1**", such as "**Flow 2, 3 or 4**", you will need to delete them. To delete these flows, first select the flow tab that you want to delete **(make sure you that don't have the Flow 1 tab selected)**, then click the drop-down menu on the top right (next to the Deploy button), select Flows, and click Delete.
+
+![Node-RED Environment Layout](images/04031-NodeRedDeleteFlow.png)
+
 1. The Node-RED Environment can be used to create IoT workflows.
 
     ![Node-RED Environment Layout](images/04030-NodeRedEnvironmentLayout.png)
