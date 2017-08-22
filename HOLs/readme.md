@@ -45,7 +45,6 @@ Tasks
 1. [Processing Temperature Data with Stream Analytics](#ProcessingWithStreamAnalytics)
 1. [Displaying Temperature Data with Azure Web Apps](#AzureWebApp)
 1. [Sending Messages from the Azure IoT Hub to the Intel Gateway](#CloudToDeviceMessages)
-1. [TIME PERMITTING - Display Temperature Data with Power BI Embedded](#PowerBIEmbedded)
 1. [Cleaning Up](#CleaningUp)
 
 ___
@@ -667,7 +666,7 @@ In this task, we'll update the Intel NUC with some packages to help it talk to o
 
     ![Add Repo](images/09010-AddRepo.png)
 
-1. In the "**Manage Repositories**" window, in the fields under "**Add New Repository**" enter the following, and click the "**Add Repository**" button:
+1. In the "**Manage Repositories**" window you will see a list of Existing Repositories. If you already have `IoT_Cloud` in the list, then skip this step and move onto step 6. Otherwise in the fields under "**Add New Repository**" enter the following, and click the "**Add Repository**" button:
 
     > **Note**: The `IoT_Cloud` repo is provided by Intel and includes some packages for working with Azure's IoT services.  Once we add a reference to the repo (which is what we are doing here), we can later install packages from it using apt-get.
 
@@ -690,8 +689,9 @@ In this task, we'll update the Intel NUC with some packages to help it talk to o
 
     ![Close Manage Repositories Window](images/09040-CloseManageRepositoriesWindow.png)
 
-1. Next, click the "**Add Packages +**" button:
+1. Next, scroll down through the list of Installed Packages. If you see the package **packagegroup-cloud-azure** in the list as shown below, skip to step 11, otherwise click the "**Add Packages +**" button:
 
+    ![Add Packages](images/09051-InstalledPackagesList.png)
     ![Add Packages](images/09050-AddPackagesButton.png)
 
 1. In the "**Add New Packages**" window, in the search box, type "**cloud-azure**", then click the "**Install**" button next to the "**packagegroup-cloud-azure**" package.  Again, this takes a few minutes so be patient:
@@ -748,7 +748,64 @@ In this task, we'll update the Intel NUC with some packages to help it talk to o
 
     ![Deploy the Changes](images/09120-DeployChanges.png)
 
-1. Now the that device is publishing messages to the IoT Hub, we want to verify that by reading the messages back.  From the command prompt or terminal window ***on your system***, run the following command to monitor the messages being sent into your Azure IoT Hub the Node-RED flow running on the NUC:
+1. Now the that device is publishing messages to the IoT Hub, we want to verify that by reading the messages back.
+ 
+    In order to monitor device messages, we will use a node.js command line interface for working with your Azure IoT Hubs called "**<a target="_blank" href="https://www.npmjs.com/package/iothub-explorer">iothub-explorer</a>**"
+    
+    This task requires that you have Node.js 4.x or later installed.  If you don't have it installed already, you can install it from **<a target="_blank" href="https://nodejs.org/en/">nodejs.org</a>**.  Make sure that Node is added to the path so you can access it from anywhere on the command line.
+    
+    1. Open a command prompt, or terminal window, **on your development PC** (not on the NUC) and install the "iothub-explorer" npm package globally as follows:
+
+        > **Note**: **MAKE SURE TO USE THE -g OPTION TO INSTALL THE PACKAGE GLOBALLY**
+
+        ```text
+        npm install -g iothub-explorer
+        ```
+
+        > **Note**: **IF YOU'RE ON A MAC OR LINUX PC, YOU NEED TO USE 'SUDO' TO GAIN ADMIN PRIVILEGES FOR THE COMMAND ABOVE**
+    
+    1. Now that we have iothub-explorer installed, we can use it to interact with our Azure IoT Hub.  At your command window or terminal prompt, enter:
+
+        ```text
+        iothub-explorer
+        ```
+        It will display its usage details:
+
+        ```text
+        Usage: iothub-explorer [options] <command> [command-options] [command-args]
+
+
+        Commands:
+
+            login                                                                          start a session on your IoT hub
+            logout                                                                         terminate the current session on your IoT hub
+            list                                                                           list the device identities currently in your IoT hub device registry
+            create <device-id|device-json>                                                 create a device identity in your IoT hub device registry
+            delete <device-id>                                                             delete a device identity from your IoT hub device registry
+            get <device-id>                                                                get a device identity from your IoT hub device registry
+            import-devices                                                                 import device identities in bulk: local file -> Azure blob storage -> IoT hub
+            export-devices                                                                 export device identities in bulk: IoT hub -> Azure blob storage -> local file
+            send <device-id> <message>                                                     send a message to the device (cloud-to-device/C2D)
+            monitor-feedback                                                               monitor feedback sent by devices to acknowledge cloud-to-device (C2D) messages
+            monitor-events [device-id]                                                     listen to events coming from devices (or one in particular)
+            monitor-uploads                                                                monitor the file upload notifications endpoint
+            monitor-ops                                                                    listen to the operations monitoring endpoint of your IoT hub instance
+            sas-token <device-id>                                                          generate a SAS Token for the given device
+            simulate-device <device-id>                                                    simulate a device with the specified id
+            get-twin <device-id>                                                           get the twin of a device
+            update-twin <device-id> <twin-json>                                            update the twin of a device and return it.
+            query-twin <sql-query>                                                         Gets the twin of a device
+            query-job [job-type] [job-status]                                              Gets the twin of a device
+            device-method <device-id> <method-name> [method-payload] [timeout-in-seconds]  Gets the twin of a device
+            help [cmd]                                                                     display help for [cmd]
+
+        Options:
+
+            -h, --help     output usage information
+            -V, --version  output the version number
+        ```
+    
+1. From the command prompt or terminal window ***on your system***, run the following command to monitor the messages being sent into your Azure IoT Hub the Node-RED flow running on the NUC:
 
     - You will need to copy the '**IoT Hub "iothubowner" SAS Policy Primary Connection String**' from the "**[myresources.txt](./myresources.txt)**" file.
 
@@ -847,12 +904,11 @@ We'll start out creating the ***&lt;name&gt;sql*** Azure SQL Server, and the ***
     - Password - **`P@ssw0rd`** (Captial "`P`", an "`@`" instead of an "a" and a zero, "`0`", instead of an "o")
     - Confirm Password - **`P@ssw0rd`**
     - Location - **Select the same region you provisioned the Azure IoT Hub into**
-    - Create V12 server - **Yes** (if it is present.  If the option doesn't appear, V12 is assumed)
     - Allow azure services to access server: **Checked**
 
     ![New SQL Server Properties](images/10030-NewSQLServerProperites.png)
 
-1. Click "**Pricing tier**", then find and select the "**B Basic**" pricing tier, and click the "**Select**" button to select it.
+1. Click "**Pricing tier**", then find and select the "**Basic**" pricing tier, and click the "**Apply**" button to select it.
 
     ![Basic Pricing Tier](images/10040-SQLDBPricingTier.png)
 
@@ -972,6 +1028,7 @@ Next up is the ***&lt;name&gt;alerts*** Event Hub that the ***&lt;name&gt;job***
     - Resource group - Choose "**Use existing**" and select the ***&lt;name&gt;group*** resource group created previously
     - Location - **Use the same location as the previous resources**
     - Pin to dashboard - **Checked**
+    - Leave all other options as default.
 
     ![Create Namespace](images/10230-CreateNamespace.png)
 
@@ -984,7 +1041,8 @@ Next up is the ***&lt;name&gt;alerts*** Event Hub that the ***&lt;name&gt;job***
     - Name - ***&lt;name&gt;alerts***
     - Partition Count - **2**
     - Message Retention - **1**
-    - Archive - **Off**
+    - Capture - **Off**
+    - Leave all other options as default.
 
     ![Create New Event Hub](images/10250-NewEventHubProperties.png)
 
@@ -1151,6 +1209,7 @@ We'll start by creating the Azure App Service Plan and Web App in the portal.
     - App name - ***&lt;name&gt;web***
     - Subscription - **Chose the same subscription used for the previous resources**
     - Resource group - Choose "**Use existing**" and select the ***&lt;name&gt;group*** resource group created previously
+    - OS - **Windows**
     - App Insights - **Off**
 
     ![New Web App Properties](images/11020-WebAppProperties.png)
@@ -1406,7 +1465,9 @@ In this task, we'll create the **TempAlert** function and have it receive those 
 
     ![New Function App](images/12070-NewFunctionApp.png)
 
-1. When the new Function App is deployed, and its blade open's in the portal, click the "**+New Function**" button, and select "**EventHubTrigger - C#**"
+1. When the new Function App is deployed, and its blade open's in the portal, click the "**+New Function**" button and then click "**Custom Function**". Then select the "**EventHubTrigger - C#**" tile.
+    
+    ![Event Hub New Custom Function](images/12081-NewCustomFunction.png)
 
     ![Event Hub Trigger C# Function](images/12080-NewCSharpEventHubTriggerFunction.png)
 
@@ -1417,12 +1478,9 @@ In this task, we'll create the **TempAlert** function and have it receive those 
 
     ![New Function Properties](images/12090-NewFunctionProperties.png)
 
-1. On the "**Service Bus connection**" blade, click "**Add a connection string**" the configure the properties on the "**Add Service Bus connection**" blade as follows and click "**OK**":
+1. In the "**Connection**" pop-up window, select the namespace ***&lt;name&gt;ns*** and event hub ***&lt;name&gt;alerts*** from the drop down lists. Click "**Select**" button.
 
-    - Connection name - ***&lt;name&gt;ns***
-    - Connection string - Copy the value from your Event Hub for the "**Root Manage Shared Access Key SAS Policy Primary Connection String:**" from the "**[myresources.txt](./myresources.txt)**" (The connection string should start with "**`Endpoint=sb://`**" and contain "**`SharedAccessKeyName=RootManageSharedAccessKey`**") file and paste it in here.  This connection string gives your Azure Function app permissions to connect to your Service Bus Namespace, and Event Hub with all the permissions it needs.
-
-    ![Event Hub Connection String](images/12100-EventHubConnection.png)
+   ![Event Hub Connection String](images/12100-EventHubConnection.png)
 
 1. Finally, click the "**Create**" button to create the function:
 
@@ -1435,11 +1493,11 @@ In this task, we'll create the **TempAlert** function and have it receive those 
     - Event parameter name: **`myEventHubMessage`**
     - Event Hub consumer group: **$Default**
     - Event Hub name: ***`<name>alerts`***
-    - Event Hub connection: ***`<name>ns`***
+    - Event Hub connection: ***`<name>ns_RootManagedSharedAccessKey_EVENTHUB`***
 
     ![Function Integration](images/12110-FunctionIntegration.png)
 
-1. Switch back to the "**Develop**" page for the function.  The code for our C# function is stored in the "**run.csx**"" file.  The default code simply logs the contents of the "myEventHubMessage" parameter value to the console.
+1. Click on the "**TempAlert**" node to switch to develop mode. The code for our C# function is stored in the "**run.csx**"" file.  The default code simply logs the contents of the "myEventHubMessage" parameter value to the console.
 
     ![Default Code](images/12120-DefaultCode.png)
 
@@ -1447,11 +1505,11 @@ In this task, we'll create the **TempAlert** function and have it receive those 
 
     ![Copy Run.csx](images/12126-CopyRunCsxToClipboard.png)
 
-1. Back in the portal, replace the entire contents of the run.csx file with the code you just copied, then click the "**Save**" button to save the changes:
+1. Back in the portal, replace the entire contents of the run.csx file with the code you just copied, then click the "**Save**" button to save the changes. 
 
     ![Paste Code into run.csx in the Portal](images/12128-PasteCodeInRunCsx.png)
 
-1. The code we pasted into "**run.csx**" depends on some libraries (like `Microsoft.Azure.Devices` and `Newtonsoft.Json` as well as others.  To make sure the the libraries are installed on the server, we need to specify them in a "**project.json**" file. To add a "**project.json**" file to our our function, click the "**View Files**"" button, then click the "**+ Add**" button, and name the new file "**project.json**" (all lower case):
+1. The code we pasted into "**run.csx**" depends on some libraries (like `Microsoft.Azure.Devices` and `Newtonsoft.Json` as well as others.  To make sure the the libraries are installed on the server, we need to specify them in a "**project.json**" file. To add a "**project.json**" file to our our function, click "**View Files**" on the right hand pane to expand it, then click the "**+ Add**" button, and name the new file "**project.json**" (all lower case):
 
     ![Add project.json](images/12130-AddProjectJson.png)
 
@@ -1471,7 +1529,7 @@ In this task, we'll create the **TempAlert** function and have it receive those 
 
     ![Review run.csx](images/12170-RevewRunCsx.png)
 
-1. In the "**run.csx**" file, locate the line of code that reads (should be at line 31 or so):
+1. In the "**run.csx**" file, locate the line of code that reads (should be at line 27 or so):
 
     ```c#
     static string connectionString = "<Your IoT Hub "service" SAS Policy Primary Connection String goes here>";
@@ -1514,374 +1572,6 @@ In this task, we'll create the **TempAlert** function and have it receive those 
         ![Temp Alert on LCD](images/12210-TempAlertOnLcd.png)
 
     - And lastly, if you have the Buzzer plugged in, you should hear it buzz for one second each time an alert comes in!
-
-1. That's it.  Your function works.  However by default the app can be shutdown if it isn't being regularly accessed.  To keep it active:
-
-    - Click the "**Function app settings**" link, then pick **"Go to App Service Settings**"
-
-        ![Function App Settings](images/12230-FunctionAppSettings.png)
-
-    - Click "**Application settings**" then turn the "**Always On**" setting to "**On**" and click the "**Save**" button along the top.
-
-        ![Always On](images/12240-AlwaysOn.png)
-___
-
-<a name="PowerBIEmbedded"></a>
-TIME PERMITTING - Display Temperature Data with Power BI Embedded
----
-
-***AS OF FEBRUARY 2017, THERE ARE SOME ISSUES WITH THE POWERBI-CLI THAT MAY PREVENT YOU FROM SUCCESSFULLY COMPLETING THIS SECTION.  FEEL FREE TO PROCEED, BUT BE AWARE YOU MAY ENCOUNTER ISSUES. AS THE ISSUES WITH POWERBI-CLI ARE RESOLVED, THIS SECTION WILL BE UPDATED TO REFLECT THOSE CHANGES.***
-
-In this task, we'll walk through publishing a pre-created Power BI report into a Power BI collection and Workspace in your Azure Subscription.  You can learn more about Power BI Embedded here: <a target="_blank" href="https://azure.microsoft.com/en-us/services/power-bi-embedded/">azure.microsoft.com/en-us/services/power-bi-embedded/</a>
-
-1. You **DO NOT NEED** to edit the report provided, however, if you would like to see how it was authored, and your are on a Windows system, you can download "**Power BI Desktop**" from <a target="_blank" target="_blank" href="https://powerbi.microsoft.com/en-us/desktop/">powerbi.microsoft.com/en-us/desktop/</a>.  Once you have downloaded it, you can open the "**HOLs\PowerBI\TemperatureChart.pbix**" file to view how it was designed.  **REGARDLESS, DO NOT MAKE CHANGES TO THE REPORT AT THIS TIME!**
-
-    ![Report in Power BI Desktop](images/13010-TemperatureChartReportInDesktop.png)
-
-1. To publish the report to Power BI Embedded, we need to first create a "**Power BI Embedded Workspace Collection**".  Open the **<a target="_blank" href="https://portal.azure.com/">Azure Portal</a>** (<a target="_blank" href="https://portal.azure.com/">https://portal.azure.com</a>) and close any blades left open from previous steps. Then click "**+ New**" | "**Intelligence + analytics**" | "**Power BI Embedded**"
-
-    ![New Power BI Embedded Workspace Collection](images/13020-NewPowerBiEmbeddedCollection.png)
-
-1. Complete the properties for the new collection as follows, then click "**Create**" to create it:
-
-    - Workspace Collection Name - ***&lt;name&gt;collection***
-    - Subscription - **Chose the same subscription used for the previous resources**
-    - Resource group - Choose "**Use existing**" and select the ***&lt;name&gt;group*** resource group created previously
-    - Location - **Use the same location as the previous resources**
-    - Pricing - Leave as "**Standard**"
-    - Pin to dashboard - **Checked**
-
-    ![Collection Properties](images/13030-PowerBiCollectionProperties.png)
-
-1. Once the new Power BI Embedded Workspace Collection is created, click the "**Access keys**" button along the right of its blade:
-
-    ![Access Keys](images/13040-CollectionAccessKeys.png)
-
-1. Then click the icon to the right of the "**KEY 1**" value to copy it to the clipboard:
-
-    ![Key 1](images/13050-AccessKey1.png)
-
-1. And document your collection name and key in the "**[myresources.txt](./myresources.txt)**" file.
-
-    ![Document Collection](images/13060-DocumentCollectionNameAndKey.png)
-
-1. A "**Workspace Collection**" is just what it sounds like, it is a collection of one or more "**Workspace**" instances. To upload a report, it must go into a Workspace, but at the time of this writing you can't create new Workspaces in the Azure portal.  The rest of our interaction with the Power BI Embedded service will be via the "**powerbi-cli** npm package (<a target="_blank" href="https://www.npmjs.com/package/powerbi-cli">link</a>).  Open a command prompt or terminal window and issue the following npm command to install the "**powerbi-cli**" package globally:
-
-    > **Note**: Some users on non-Windows OSs are having issues with the powerbi-cli at least as recently as v1.0.6.  If you are having issues using the powerbi-cli commands you may want to try it from a Windows machine if you have access to one.  If you are at an event, find a fellow participant with Windows that will let you run the powerbi-cli commands from their computer.  You can create your own folder on their machine store store the powerbi config created for your collection, and they can easily delete that folder when you are done.
-
-    ```text
-    npm install -g powerbi-cli
-    ```
-
-1. Make sure the powerbi-cli version is at LEAST v1.0.8 or later.  If you installed the powerbi-cli previously, the version might be lower. Go ahead and run the `npm install -g powerbi-cli` command from above to ensure you are running the latest version:
-
-    ```bash
-    powerbi --version
-    ```
-
-    Example output:
-
-    ```bash
-    1.0.8
-    ```
-
-
-1. Once it is installed, in the command prompt or terminal window, change into the "**HOLs\PowerBI**" folder, and run the following command and use the collection name and key you just pasted into the "**[myresources.txt](./myresources.txt)**" file to tell the powerbi how to connect to our workspace collection:
-
-    > **Note**: The `powerbi config` command creates a `.powerbirc` file in the directory where the command was executed.  It contains sensitive connection information about how to connect to to your Power BI Embedded Workspace Collection so be careful who you expose that file to.
-
-    > **Note**: If you receive an error similar to `powerbi-config(1) does not exist, try --help` you may want to refer to <a target="_blank" href="https://github.com/Microsoft/PowerBI-Cli/issues/5#issuecomment-251419579">Microsoft/PowerBI-Cli#5 (comment)</a> for a possible workaround.  Or, as an alternative you can simply supply the key, collection name, and workspace id for each powerbi command you execute.  You do not NEED to do the powerbi config commands, it just helps make future statements easier.
-
-    ```text
-    powerbi config -c <collectioName> -k "<accessKey>"
-    ```
-    For example:
-
-    ```text
-    powerbi config -c mic16collection -k "BoeKHkxkB/JuHsXTRsgUSegrvNnMC97YgycKJYXKDY7q9v5nbSxpoJkfvMmvMr68CrAi1iQVv0KgCpjlVtLIxw=="
-    ```
-
-    Which returns this output as shown below.  The values shown here are stored in the ".powerbirc" file in the current directory:
-
-    ```text
-    [ powerbi ] collection: mic16collection
-    [ powerbi ] accessKey: BoeKHkxkB/JuHsXTRsgUSegrvNnMC97YgycKJYXKDY7q9v5nbSxpoJkfvMmvMr68CrAi1iQVv0KgCpjlVtLIxw==
-    ```
-
-1. Now, we can create a new "**Workspace**". Workspaces are the containers that we upload reports into.  Use the following command:
-
-    ```text
-    powerbi create-workspace
-    ```
-    Which returns output similar to the following, showing the Id of the workspace that was created:
-
-    > **Note**: When a PowerBI Embedded Collection has just been created, you may get intermittent errors when attempting to connect to it.  If you get an error, first verify that you are using the proper values as arguments, and then continue to repeat the statement until it succeeds.
-
-    ```text
-    [ powerbi ] Workspace created: 9c3b7e34-4a86-4c9b-9534-f9f3953e7f92
-    ```
-
-    Then save the new Workspace Id to the config so you don't have to enter it each time:
-
-    ```text
-    powerbi config -w <workspaceId>
-    ```
-
-    For example:
-
-    ```text
-    powerbi config -w 9c3b7e34-4a86-4c9b-9534-f9f3953e7f92
-    ```
-
-    Which returns:
-
-    ```text
-    [ powerbi ] collection: mic16collection
-    [ powerbi ] accessKey: BoeKHkxkB/JuHsXTRsgUSegrvNnMC97YgycKJYXKDY7q9v5nbSxpoJkfvMmvMr68CrAi1iQVv0KgCpjlVtLIxw==
-    [ powerbi ] workspace: 9c3b7e34-4a86-4c9b-9534-f9f3953e7f92
-    ```
-
-    Finally, copy the new Workspace ID returned from the statement above and past it into the "**[myresources.txt](./myresources.txt)**" file.
-
-    ![Workspace ID Documented](images/13070-WorkspaceIdDocumented.png)
-
-1. Now we can upload our report (the TemperatureChart.pbix file) into our new workspace:
-
-    > **Note**: These commands assume you are in the "**HOLs\PowerBI**" folder.
-
-    ```text
-    powerbi import -n <what to call the report> -f <local path the to your .pbix file>
-    ```
-
-    For example:
-
-    ```text
-    powerbi import -n "TemperatureChart" -f "TemperatureChart.pbix"
-    ```
-
-    Which returns something like:
-
-    ```text
-    [ powerbi ] Importing TemperatureChart.pbix to workspace: 9c3b7e34-4a86-4c9b-9534-f9f3953e7f92
-    [ powerbi ] File uploaded successfully
-    [ powerbi ] Import ID: b3cd9de9-11e5-473c-9b55-0e569c89a756
-    [ powerbi ] Checking import state: Publishing
-    [ powerbi ] Checking import state: Succeeded
-    [ powerbi ] Import succeeded
-    ```
-
-1. Next, we'll retrieve the unique IDs for the report, and the dataset in it:
-
-    ```text
-    powerbi get-reports
-    ```
-
-    Returns:
-
-    ```text
-    [ powerbi ] =========================================
-    [ powerbi ] Gettings reports for Collection: 9c3b7e34-4a86-4c9b-9534-f9f3953e7f92
-    [ powerbi ] =========================================
-    [ powerbi ] ID: 9cc7d690-2d22-4d8c-be13-66b8d9349167 | Name: TemperatureChart
-    ```
-
-    And
-
-    ```text
-    powerbi get-datasets
-    ```
-
-    Returns
-
-    ```text
-    =========================================
-    Gettings datasets for Collection: 9c3b7e34-4a86-4c9b-9534-f9f3953e7f92
-    =========================================
-    ID: ed212c12-0335-414d-b0f1-d4e1be1268da | Name: TemperatureChart
-    ```
-
-1. Copy the report and Data set IDs returned from the last two statements and past them into the "**[myresources.txt](./myresources.txt)**" file.
-
-    ![Document Report and Dataset IDs](images/13073-DocumentReportAndDataset.png)
-
-1. The last step on the report side is to update the connection information for the Dataset in the report to point to our Azure SQL Database, on our Azure SQL Server with our login credentials.
-
-    We need to create a connection string in the right format.  Here is the template for the connection string:
-
-    ```text
-    "data source=<name>sql.database.windows.net;initial catalog=<name>db;persist security info=True;encrypt=True;trustservercertificate=False"
-    ```
-
-    Replace the ***&lt;name&gt;sql*** and ***&lt;name&gt;db*** values above with your own.  For example:
-
-    ```text
-    "data source=mic16sql.database.windows.net;initial catalog=mic16db;persist security info=True;encrypt=True;trustservercertificate=False"
-    ```
-1. Copy the connection string and paste it into the "**[myresources.txt](./myresources.txt)**" file:
-
-    ![Document Connection String](images/13075-DocumentConnectionString.png)
-
-1. Next, use the values for our Dataset ID, SQL Login Name and Password, and the Connection String from above to complete the following statement:
-
-    ```text
-    powerbi update-connection --dataset "<Dataset ID>" --username <your sql login> --password "<your sql password>" --connectionString "<your connection string>"
-    ```
-
-    For example:
-
-    ```text
-    powerbi update-connection --dataset "ed212c12-0335-414d-b0f1-d4e1be1268da" --username sqladmin --password "P@ssw0rd" --connectionString "data source=mic16sql.database.windows.net;initial catalog=mic16db;persist security info=True;encrypt=True;trustservercertificate=False"
-    ```
-    Which returns something similar to:
-
-    > **Note**: Sometimes this fails.  If you get an error, double check your parameters, **but even if they are correct, simply running the command a second or third time may work**.
-
-    ```text
-    [ powerbi ] Found dataset!
-    [ powerbi ] Id: ed212c12-0335-414d-b0f1-d4e1be1268da
-    [ powerbi ] Name: TemperatureChart
-    [ powerbi ] Updating connection string...
-    [ powerbi ] Getting gateway datasources...
-    [ powerbi ] Connection string successfully updated
-    [ powerbi ] Dataset:  ed212c12-0335-414d-b0f1-d4e1be1268da
-    [ powerbi ] ConnectionString:  data source=mic16sql.database.windows.net;initial catalog=mic16db;persist security info=T
-    rue;encrypt=True;trustservercertificate=False
-    [ powerbi ] Found 1 Datasources for Dataset ed212c12-0335-414d-b0f1-d4e1be1268da
-    [ powerbi ] --------------------------------------------------------------------
-    [ powerbi ] Datesource ID:  dbb612f8-06c8-481c-984d-3b3e28391cf3
-    [ powerbi ] Gateway ID:  8b37fcc6-be5a-47e3-a48d-9d9390b29338
-    [ powerbi ] Credential Type:  undefined
-    [ powerbi ] Datasource Type:  Sql
-    [ powerbi ] Updating datasource credentials...
-    [ powerbi ] Successfully updated datasource credentials!
-    [ powerbi ] Datasource ID:  dbb612f8-06c8-481c-984d-3b3e28391cf3
-    [ powerbi ] Gateway ID:  8b37fcc6-be5a-47e3-a48d-9d9390b29338
-    ```
-
-1. Ok, the last step is to actually embed the report into our web app.  Most of the code has already been written for us, we just need to make a few quick changes. To get started, open the "**HOLs\WebApp"** folder directly in ***A SEPARATE INSTANCE*** of "**Visual Studio Code**" just as you did when you were working with the web app previously.  Use the values you've saved in the "**[myresources.txt](./myresources.txt)**" file to complete the "powerbi*" config settings in the config.json file, and **Save** your changes:
-
-    ![Power BI Config Settings](images/13080-PowerBIConfigValues.png)
-
-    For Example:
-
-    ![Power BI Config Completed](images/13085-PowerBIConfigCompleted.png)
-
-1. Next, open the "**public/index.html**" file and locate the code as shown below. The div that will contain our embedded report has been commented out, and a placeholder `<img/>` is being displayed instead.  We need to switch that around so the `<img/>` is commented out, and the `<div..></div>` is availabe.
-
-    ```html
-    <img src="images/chartplaceholder.png" style="width:455px;height:380px;border:none;" />
-    <!--
-    <div id="powerbiReport" powerbi-type="report" style="height:380px;"></div>
-    -->
-    ```
-    and switch them around so the `<img.../>` tag is commented out, and the `<div...></div>` tag isn't
-
-    ```html
-    <!--
-    <img src="images/chartplaceholder.png" style="width:455px;height:380px;border:none;" />
-    -->
-    <div id="powerbiReport" powerbi-type="report" style="height:380px;"></div>
-    ```
-
-    ![Commented Out Image](images/13095-CommentedOutImg.png)
-
-1. Next, near the bottom of the "**public\index.html**" file locate the following code:
-
-    ```javascript
-    //Uncomment the following line of code to embed the Power BI report.
-    //$scope.embedReport();
-    ```
-
-    And uncomment the `$scope.embedReport();` statement:
-
-    ```javascript
-    //Uncomment the following line of code to embed the Power BI report.
-    $scope.embedReport();
-    ```
-
-    ![Uncomment embedReport() call](images/13110-EmbedReportCallUncommented.png)
-
-    This will cause some code to run when the page is loaded to embed the report into the `<div />` container we uncommented above. **Save** your changes.
-
-1. The following information is just FYI, you don't need to do anything with this code:
-
-    The embedReport() function we are calling above calls into the backend node.js application hosted in server.js to retrieve a valid "**embed token**" for the report.
-
-    ```javascript
-    $scope.embedReport = function () {
-        //Get just the very latest measurements from the node.js server back end
-        $http.get('/api/powerbiembedconfig').success(function(config) {
-
-            if(config) {
-                var powerbiReport = angular.element( document.querySelector( '#powerbiReport' ) )[0];
-                powerbi.embed(powerbiReport,config);
-            }
-        });
-    }
-    ```
-
-    The `/api/powerbiembedconfig` route on the backend server in server.js uses the **<a target="_blank" href="https://www.npmjs.com/package/powerbi-api">powerbi-api</a>** node.js library to create a "**JSON Web Token**" or "**JWT**" token that the embedded request uses to authenticate with the Power BI Embedded service.  The "**JWT**" token is signed by your Workspace Collection's Access Key which is known by the backend server, but not the front end web application:
-
-    ```javascript
-    app.get('/api/powerbiembedconfig',
-        function(req,res){
-            //FYI, http://calebb.net and http://jwt.io have token decoders you can use to inspect the generated token.
-
-            // Set the expiration to 24 hours from now:
-            var username = null;  //Not creating a user specific token
-            var roles = null;     //Not creating a role specific token
-            var expiration =  new Date();
-            expiration.setHours(expiration.getHours() + 24);
-
-            // Get the other parameters from the variables we initialized
-            // previously with values from the config.json file.
-            // Then generate a valid Power BI Report Embed token with the values.
-            var token = powerbi.PowerBIToken.createReportEmbedToken(
-                powerbiCollectionName,
-                powerbiWorkspaceId,
-                powerbiReportId,
-                username,
-                roles,
-                expiration);
-            // And sign it with the provided Power Bi Access key
-            // Again, this value comes from the config.json file
-            var jwt = token.generate(powerbiAccessKey);
-
-            // Create the required embed configuration for the
-            // web client front end to use
-            var embedConfig = {
-                type: 'report',
-                accessToken: jwt,
-                id: powerbiReportId,
-                embedUrl: 'https://embedded.powerbi.com/appTokenReportEmbed'
-            };
-
-            // And pass that config back to the user as the response.
-            res.json(embedConfig);
-        }
-    );
-    ```
-
-1. Regardless, we should be done.  Let's commit our changes into the git repo, and sync with the Azure Web App repo in Azure..
-
-    In Visual Studio Code, click the "**git**" icon on the left, add a comment to the commit message box at the top, and click the "**checkmark**" icon to commit your changes:
-
-    ![Commit Changes](images/13120-CommitChanges.png)
-
-1. Then still on the "**git**" panel, click the "**...**" ellipsis button at the top, and select "**Sync**" to push our changes up to the Azure Web Apps.
-
-    ![Sync Changes](images/13130-SyncWithAzure.png)
-
-1. Then, in the **<a target="_blank" href="https://portal.azure.com/">Azure Portal</a>** (<a target="_blank" href="https://portal.azure.com/">https://portal.azure.com</a>), on the "**Deployment options**" for your ***&lt;name&gt;web*** Web App, verify that the deployment succeeds:
-
-    ![Verify Deployment](images/13140-VerifyTheDeploymentSucceeded.png)
-
-1. Then in your browser open the web site in azure (`***http://<name>web.azurewebsites.net`***) and check out the new report!
-
-    ![Embedded Report Visible](images/13150-EmbeddedReportVisibleInAzure.png)
-
-1. The page is set to refresh automatically every 30 seconds.  You should see that the report updates the data it displays as well!
-
 ___
 
 <a name="CleaningUp"></a>
